@@ -33,7 +33,7 @@ This project analyzes e-commerce transaction data to identify revenue drivers, c
 
 ![Monthly_Revenue](images/Monthly_Revenue.png)
 ![KPI_summary](images/KPI_summary.png)
-![Segments](images/Segmenets.png)
+![Segments](images/Segments.png)
 ![Top_10_countries](images/Top_10_countries.png)
 ![Top_10_items](images/Top_10_items.png)
 https://public.tableau.com/views/Top_10_by_items/Sheet1?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
