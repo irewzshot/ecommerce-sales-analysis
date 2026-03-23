@@ -1,0 +1,166 @@
+---
+title: "analysis.Rmd"
+author: "Gennadii Barkhatov"
+date: "2026-03-23"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(janitor)
+library(lubridate)
+```
+
+## Project Overview
+This report provides an end-to-end analysis of the Online Retail dataset, focusing on data cleaning, sales performance, and customer segmentation using the RFM (Recency, Frequency, Monetary) model.
+
+## Data Preparation and Cleaning
+The initial dataset was cleaned to ensure financial accuracy. First of all, let's get familiar with our data:
+
+
+```{r cleaning}
+online_retail <- read_csv("~/online_retail_II.csv")
+
+head(online_retail)
+str(online_retail)
+summary(online_retail)
+online_retail %>% 
+  head(100) %>% 
+  View()
+```
+
+## 
+
+So the data has negative quantity and price. We can look at them closer:
+
+```{r determine negative values}
+online_retail %>% 
+  filter(Price < 0) %>% 
+  select(Invoice, Description, 'Price', `Customer ID`,) %>% 
+  View()
+```
+
+##
+
+We can't let negative  and NA values bias our analysis so it must be eliminated:
+
+```{r cleaning}
+online_retail_clean <- online_retail %>% 
+  filter(Description != "Adjust bad debt", Quantity > 0) %>% 
+  drop_na('Customer ID') %>% 
+  distinct()
+
+summary(online_retail_clean)
+```
+
+##
+
+Alright, now let's create a Revenue column in our data frame
+
+```{r }
+online_retail_clean <- online_retail_clean %>% 
+  mutate(online_retail_clean, Revenue = Quantity * Price)
+
+str(online_retail_clean)
+```
+
+## 
+
+Looks great! So after all of this preparing it's time to retrieve some relevant data for our analysis:
+
+```{r creating summary tables}
+monthly_revenue <- online_retail_clean %>% 
+  mutate(Month = month(InvoiceDate, label = TRUE, abbr = FALSE)) %>% 
+  group_by(Month) %>% 
+  summarise(Total_revenue = sum(Revenue, na.rm = TRUE)) %>% 
+  arrange(Month)
+
+print(monthly_revenue)
+
+top_10_items <- online_retail_clean %>%
+  group_by(Description) %>% 
+  summarise(Total_Revenue = sum(Revenue, na.rm = TRUE)) %>% 
+  arrange(desc(Total_Revenue)) %>% 
+  slice_max(Total_Revenue, n = 10)
+
+print(top_10_items)
+
+top_10_countries <- online_retail_clean %>%
+  group_by(Country) %>% 
+  summarise(Total_Revenue = sum(Revenue, na.rm = TRUE)) %>% 
+  arrange(desc(Total_Revenue)) %>% 
+  slice_max(Total_Revenue, n = 10)
+
+print(top_10_countries)
+
+rfm_table <- online_retail_clean %>%
+  mutate(InvoiceDate = as.Date(InvoiceDate, format = "%m/%d/%Y")) %>%
+  filter(!is.na(`Customer ID`), Price > 0) %>% # Clean data
+  group_by(`Customer ID`) %>%
+  summarise(
+    Recency = as.numeric(as.Date("2012-01-01") - max(InvoiceDate)), # Adjust date to your data's end
+    Frequency = n_distinct(Invoice),
+    Monetary = sum(Revenue, na.rm = TRUE)
+  ) %>% 
+  arrange(desc(Monetary))
+
+glimpse(rfm_table)
+
+rfm_scores <- rfm_table %>%
+  mutate(
+    R_Score = ntile(desc(Recency), 5), # desc() because lower recency = better score
+    F_Score = ntile(Frequency, 5),
+    M_Score = ntile(Monetary, 5),
+    RFM_Combined = R_Score + F_Score + M_Score
+  )
+
+glimpse(rfm_scores)
+
+rfm_segments <- rfm_scores %>%
+  mutate(Segment = case_when(
+    R_Score >= 4 & F_Score >= 4 & M_Score >= 4 ~ "VIP",
+    F_Score >= 4 ~ "Loyal",
+    R_Score <= 2 ~ "At Risk",
+    TRUE ~ "Others"
+  ))
+# View results
+rfm_segments_results <- rfm_segments %>% 
+  group_by(Segment) %>% 
+  summarise(Count = n(), Avg_Monetary = mean(Monetary))
+
+glimpse(rfm_segments_results)
+
+kpi_summary <- online_retail_clean %>% 
+  summarise(
+    Total_Revenue = sum(Revenue, na.rm = TRUE),
+    Total_Invoices = n_distinct(Invoice),
+    Total_Customers = n_distinct(`Customer ID`),
+    AOV = Total_Revenue / Total_Invoices  # This is your KPI
+  )
+
+glimpse(kpi_summary)
+```
+
+##
+
+It seems wery useful at a glance! So now we need to write all tables as a .csv files to use them for our next visualizations!
+
+```{r saving files}
+write_csv(kpi_summary, "kpi_summary.csv")
+write_csv(monthly_revenue, "monthly_revenue.csv")
+write_csv(online_retail_clean, "online_retail_clean.csv")
+write_csv(rfm_scores, "rfm_scores.csv")
+write_csv(rfm_segments, "rfm_segments.csv")
+write_csv(rfm_segments_results, "rfm_segments_results.csv")
+write_csv(rfm_table, "rfm_table.csv")
+write_csv(top_10_countries, "top_10_countries.csv")
+write_csv(top_10_items, "top_10_items.csv")
+```
+
+##
+
+Cool! The next step will be creating informative data visuaizations in Tableau.
+Thanks for watching!
