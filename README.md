@@ -30,6 +30,12 @@ This project analyzes e-commerce transaction data to identify revenue drivers, c
 - Remove or discount underperforming products
 
 ## Dashboards
+
+![Monthly_Revenue](images/Monthly_Revenue.png)
+![KPI_summary](images/KPI_summary.png)
+![Segments](images/Segmenets.png)
+![Top_10_countries](images/Top_10_countries.png)
+![Top_10_items](images/Top_10_items.png)
 https://public.tableau.com/views/Top_10_by_items/Sheet1?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
 https://public.tableau.com/views/Top10CountriesbyRevenue_17742459159930/Sheet1?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
 https://public.tableau.com/views/Monthly_Revenue_17742483821730/Sheet1?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
