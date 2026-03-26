@@ -40,7 +40,7 @@ This project analyzes e-commerce transaction data to identify revenue drivers, c
 ![Segments](images/Segments.png)
 ![Top_10_countries](images/Top_10_countries.png)
 ![Top_10_items](images/Top_10_items.png)
-![Forecast (Linear, Random)]("images/Forecast (Linear, Random).png")
+![Forecast_lin_forest](images/Forecast_lin_forest.png)
 https://public.tableau.com/views/Top_10_by_items/Sheet1?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
 https://public.tableau.com/views/Top10CountriesbyRevenue_17742459159930/Sheet1?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
 https://public.tableau.com/views/Monthly_Revenue_17742483821730/Sheet1?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
